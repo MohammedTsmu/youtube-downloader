@@ -5,6 +5,7 @@ const ffmpegPath = require('ffmpeg-static');
 const path = require('path');
 const fs = require('fs');
 const archiver = require('archiver');
+const ytdl = require('ytdl-core'); // إضافة مكتبة ytdl-core
 const iconv = require('iconv-lite');
 
 const app = express();
@@ -26,6 +27,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/converted', express.static(path.join(__dirname, 'converted')));
@@ -76,6 +78,37 @@ app.post('/convert', upload.array('videos'), (req, res) => {
             })
             .save(outputFilePath);
     });
+});
+
+app.post('/download-youtube', async (req, res) => {
+    const { url, quality, location, customLocation } = req.body;
+
+    try {
+        const info = await ytdl.getInfo(url);
+        const format = ytdl.chooseFormat(info.formats, { quality: quality });
+        const videoTitle = info.videoDetails.title;
+        const fileName = `${videoTitle}.${format.container}`;
+
+        let filePath;
+        if (location === 'custom' && customLocation) {
+            filePath = path.join(customLocation, fileName);
+        } else {
+            filePath = path.join(__dirname, 'uploads', fileName);
+        }
+
+        ytdl(url, { format: format })
+            .pipe(fs.createWriteStream(filePath))
+            .on('finish', () => {
+                res.json({ success: true, message: 'Video downloaded successfully!', filePath: `/uploads/${fileName}` });
+            })
+            .on('error', (err) => {
+                console.error(err);
+                res.status(500).send('Error downloading video.');
+            });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error processing YouTube URL.');
+    }
 });
 
 app.get('/clear-uploads', (req, res) => {

@@ -2,12 +2,46 @@ body {
   font-family: Arial, sans-serif;
   background-color: #f4f4f4;
   color: #333;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start; /* Changed from center to flex-start to start alignment at the top */
-  height: 100vh;
   margin: 0;
-  overflow-y: auto; /* Ensure the body can scroll */
+  display: flex;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar {
+  background: #333;
+  color: #fff;
+  width: 250px;
+  padding-top: 20px;
+  position: fixed;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.sidebar a {
+  padding: 15px 25px;
+  text-decoration: none;
+  font-size: 18px;
+  color: #fff;
+  display: block;
+  transition: all 0.3s;
+}
+
+.sidebar a:hover {
+  background: #575757;
+}
+
+.sidebar a.active {
+  background: #007bff;
+}
+
+.main-content {
+  margin-left: 250px;
+  padding: 20px;
+  flex-grow: 1;
 }
 
 .container {
@@ -16,9 +50,9 @@ body {
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   text-align: center;
-  width: 90%; /* Changed from 400px to 90% to fit various screen sizes */
-  max-width: 800px; /* Added max-width to limit the container size */
-  margin-top: 20px;
+  width: 100%;
+  max-width: 800px;
+  margin: 20px auto;
 }
 
 h1 {
@@ -34,8 +68,19 @@ h1 {
   cursor: pointer;
 }
 
-#fileInput {
+#fileInput,
+#youtubeUrl,
+#customLocation {
   display: none;
+}
+
+input[type="text"],
+select {
+  width: calc(100% - 40px);
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 button {
@@ -73,7 +118,8 @@ button:hover {
   }
 }
 
-#output {
+#output,
+#downloadOutput {
   margin-top: 20px;
   display: none;
 }
